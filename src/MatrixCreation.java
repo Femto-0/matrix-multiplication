@@ -1,34 +1,34 @@
-import java.util.Scanner;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.File;
+import java.io.IOException;
 import java.util.Random;
 public class MatrixCreation {
+    private int m;
+    private int n;
+    private int p;
+    private int maxBuffSize;
+    private int splitSize;
+    private int numConsumer;
+    private int maxProducerSleepTime;
+    private int maxConsumerSleepTime;
 
     Random rand= new Random();
 
-    public int[] getNumberOfRowsAndColumns(){
-        int[] numberOfRowsAndColumn= new int[3];
-        Scanner sc= new Scanner(System.in);
-        System.out.println("""
-            Enter the number of rows and columns for A and B
-            The format to enter the rows and columns are as follows:
-            First enter number of rows for A
-            Then enter the number of columns for A which is also going to be number of rows for B
-            Finally, enter the number of Columns for B
-            """);
-        System.out.print("Enter the number of rows for A: ");
-        numberOfRowsAndColumn[0]= sc.nextInt();
-        System.out.print("Enter the number of columns for A/ rows for B: ");
-        numberOfRowsAndColumn[1]= sc.nextInt();
-        System.out.print("Enter the number of columns for B: ");
-        numberOfRowsAndColumn[2]= sc.nextInt();
+    public void getNumberOfRowsAndColumns() throws IOException {
+        ObjectMapper objectMapper= new ObjectMapper();
+        ReadConfig readConfig= objectMapper.readValue(new File("src/config.json"), ReadConfig.class);
 
-        return numberOfRowsAndColumn;
+        this.m=readConfig.getM();
+        this.n=readConfig.getN();
+        this.p=readConfig.getP();
     }
 
-    public int[][] createRowA(int row, int column) {
-        int[][] rowA = new int[row][column];
+    public int[][] createRowA() {
+        int[][] rowA = new int[m][n];
         System.out.println("Matrix A");
-        for (int i = 0; i <= row-1; i++) {
-            for (int j = 0; j <=column-1; j++) {
+        for (int i = 0; i <= m-1; i++) {
+            for (int j = 0; j <=n-1; j++) {
                 rowA[i][j] = rand.nextInt(10);
                 System.out.print(rowA[i][j]+ " ");
             }
@@ -37,11 +37,11 @@ public class MatrixCreation {
         return rowA;
     }
 
-    public int[][] createRowB(int row, int column){
-        int[][] rowB = new int[row][column];
+    public int[][] createRowB(){
+        int[][] rowB = new int[n][p];
         System.out.println("Matrix B: ");
-        for (int i = 0; i <=row-1; i++) {
-            for (int j = 0; j <=column-1; j++) {
+        for (int i = 0; i <=n-1; i++) {
+            for (int j = 0; j <=p-1; j++) {
                 rowB[i][j] = rand.nextInt(10);
                 System.out.print(rowB[i][j]+" ");
             }
@@ -50,13 +50,10 @@ public class MatrixCreation {
         return rowB;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         MatrixCreation mc= new MatrixCreation();
-        int[] numberOfRowsAndColumn=mc.getNumberOfRowsAndColumns();
-        int rowA= numberOfRowsAndColumn[0];
-        int columnA_RowB =numberOfRowsAndColumn[1];
-        int columnB= numberOfRowsAndColumn[2];
-        mc.createRowA(rowA,columnA_RowB);
-        mc.createRowB(columnA_RowB, columnB);
+        mc.getNumberOfRowsAndColumns();
+        mc.createRowA();
+        mc.createRowB();
     }
 }
