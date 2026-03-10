@@ -1,59 +1,45 @@
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.io.File;
 import java.io.IOException;
 import java.util.Random;
 public class MatrixCreation {
-    private int m;
-    private int n;
-    private int p;
-    private int maxBuffSize;
-    private int splitSize;
-    private int numConsumer;
-    private int maxProducerSleepTime;
-    private int maxConsumerSleepTime;
+
+    AppConfig appConfig;
+    private final int m; //number of rows in Matrix A
+    private final int n; //number of columns in Matrix A or rows in Matrix B
+    private final int p; //number of columns in Matrix B
 
     Random rand= new Random();
 
-    public void getNumberOfRowsAndColumns() throws IOException {
-        ObjectMapper objectMapper= new ObjectMapper();
-        ReadConfig readConfig= objectMapper.readValue(new File("src/config.json"), ReadConfig.class);
-
-        this.m=readConfig.getM();
-        this.n=readConfig.getN();
-        this.p=readConfig.getP();
+    public MatrixCreation(AppConfig appConfig, int m, int n, int p){
+        this.appConfig=appConfig;
+        this.m=m;
+        this.n=n;
+        this.p=p;
     }
 
-    public int[][] createRowA() {
-        int[][] rowA = new int[m][n];
+    public int[][] createMatrixA() {
+        int[][] matrixA = new int[m][n];
         System.out.println("Matrix A");
         for (int i = 0; i <= m-1; i++) {
             for (int j = 0; j <=n-1; j++) {
-                rowA[i][j] = rand.nextInt(10);
-                System.out.print(rowA[i][j]+ " ");
+                matrixA[i][j] = rand.nextInt(10);
+                System.out.print(matrixA[i][j]+ " ");
             }
             System.out.println();
         }
-        return rowA;
+        return matrixA;
     }
 
-    public int[][] createRowB(){
-        int[][] rowB = new int[n][p];
+    public int[][] createMatrixB(){
+        int[][] matirxB = new int[n][p];
         System.out.println("Matrix B: ");
         for (int i = 0; i <=n-1; i++) {
             for (int j = 0; j <=p-1; j++) {
-                rowB[i][j] = rand.nextInt(10);
-                System.out.print(rowB[i][j]+" ");
+                matirxB[i][j] = rand.nextInt(10);
+                System.out.print(matirxB[i][j]+" ");
             }
             System.out.println();
         }
-        return rowB;
+        return matirxB;
     }
 
-    public static void main(String[] args) throws IOException {
-        MatrixCreation mc= new MatrixCreation();
-        mc.getNumberOfRowsAndColumns();
-        mc.createRowA();
-        mc.createRowB();
-    }
 }

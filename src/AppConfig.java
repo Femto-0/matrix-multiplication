@@ -1,17 +1,13 @@
-import com.fasterxml.jackson.databind.ObjectMapper;
+public class AppConfig {
+    private int m;
+    private int n;
+    private int p;
+    private int maxBuffSize;
+    private int splitSize;
+    private int numConsumer;
+    private int maxProducerSleepTime;
+    private int maxConsumerSleepTime;
 
-import java.io.File;
-import java.io.IOException;
-
-public class ReadConfig {
-    private int m=10;
-    private int n=10;
-    private int p=10;
-    private int maxBuffSize=5;
-    private int splitSize=3;
-    private int numConsumer=2;
-    private int maxProducerSleepTime=20;
-    private int maxConsumerSleepTime=80;
 
     public int getSplitSize() {
         return splitSize;
@@ -76,8 +72,5 @@ public class ReadConfig {
     public void setMaxConsumerSleepTime(int maxConsumerSleepTime) {
         this.maxConsumerSleepTime = maxConsumerSleepTime;
     }
-
-
-
 
 }
