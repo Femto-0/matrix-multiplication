@@ -1,5 +1,3 @@
-import java.io.IOException;
-
 public class NormalMatrixMultiplication {
 
     MatrixCreation matrixCreation;
@@ -20,12 +18,5 @@ public class NormalMatrixMultiplication {
             System.out.println();
         }
         return matrixC;
-    }
-
-    public static void main(String[] args) throws IOException {
-        AppConfig appConfig= LoadConfig.loadConfig();
-        MatrixCreation matrixCreation= new MatrixCreation(appConfig,appConfig.getM(), appConfig.getN(), appConfig.getP());
-        NormalMatrixMultiplication normalMatrixMultiplication= new NormalMatrixMultiplication(matrixCreation);
-        normalMatrixMultiplication.matrixMultiplcation(matrixCreation.createMatrixA(), matrixCreation.createMatrixB(),appConfig.getM(), appConfig.getP());
     }
 }
