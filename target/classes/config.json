@@ -1,7 +1,7 @@
 {
-  "m": 3,
-  "n": 3,
-  "p": 3,
+  "m": 10,
+  "n": 10,
+  "p": 4,
   "maxBuffSize": 5,
   "splitSize": 3,
   "numConsumer": 2,
