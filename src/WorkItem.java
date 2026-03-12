@@ -2,20 +2,12 @@ public class WorkItem {
     int[][] subA; //holds the sub-matrix for matrix A that's going to be put in the queue by producer
     int[][] subB; //sub-matrix B
     int[][] subC; //sub matrix of result matrix C
-    int lowA, highA, lowB, highB; //the low and high indices of matrix A and B. Going to be determined by "SplitSize"
+    int lowA;
+    int highA;
+    int lowB;
+    int highB; //the low and high indices of matrix A and B. Going to be determined by "SplitSize"
     boolean done; //false if the producer created this item, true once consumer processes it
 
-    public WorkItem(int[][]subA, int[][]subB, int[][]subC, int lowA, int highA, int lowB, int highB,boolean done) {
-        this.subA=subA;
-        this.subB=subB;
-        this.subC=subC;
-        this.lowA=lowA;
-        this.lowB=lowB;
-        this.highA=highA;
-        this.highB=highB;
-        this.done=done;
-
-    }
     public int[][] getSubC() {
         return subC;
     }
@@ -76,11 +68,5 @@ public class WorkItem {
         return done;
     }
 
-    public void setDone(boolean done) {
-        this.done = done;
-    }
-
-
-
-
+    public void setDone(boolean done) {this.done = done;}
 }

@@ -1,4 +1,6 @@
 import java.io.IOException;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 public class Controller {
 
@@ -13,6 +15,7 @@ public static void main(String[] args) throws IOException {
     int n=appConfig.getN();
     int p=appConfig.getP();
     int splitSize=appConfig.getSplitSize();
+    int maxBuffSize=appConfig.getMaxBuffSize();
 
     /*
     create matrix
@@ -29,12 +32,25 @@ public static void main(String[] args) throws IOException {
     normalMatrixMultiplication.matrixMultiplcation(matrixA, matrixB, m, p);
 
     /*
-    Split matrix into submatrix
+    Split matrix into sub-matrix
     Requirements: size of matrix cannot be less than the splitSize: splitSize <= m && p
      */
     MatrixSplitter matrixSplitter= new MatrixSplitter(splitSize);
     matrixSplitter.splitBasedOnRow(0, matrixA);
     matrixSplitter.splitBasedOnColumn(0, matrixB,p);
+
+    /*
+    Multiply the matrix after breaking it into smaller subunits.
+     */
+    BlockingQueue<WorkItem> sharedBuffer = new ArrayBlockingQueue<>(maxBuffSize);
+
+    //Create Producer and Consumer Threads
+    Thread producerThread= new Thread(new Producer(sharedBuffer, matrixA, matrixB, p, splitSize));
+    Thread consumerThread = new Thread(new Consumer(sharedBuffer, normalMatrixMultiplication));
+
+    //start the threads
+    producerThread.start();
+    consumerThread.start();
 
 }
 }

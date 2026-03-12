@@ -24,9 +24,9 @@ public class MatrixSplitter {
     /*
     unlike when splitting by rows, we don't have access to vertical width: number of rows. So, that's one extra input that the method needs.
      */
-    public int[][] splitBasedOnColumn(int currentColumn,int[][]matrixToBeSplitted, int heightOfMatrixToBeSplitted){
+    public int[][] splitBasedOnColumn(int currentColumn,int[][]matrixToBeSplitted, int heightOfMatrix){
         int column= currentColumn+splitSize;
-        int row= heightOfMatrixToBeSplitted;
+        int row= heightOfMatrix;
         int[][] result= new int[row][column];
         System.out.println("Splitting matrix B for split size: "+ splitSize);
         for(int i=0; i<=row-1; i++) {
