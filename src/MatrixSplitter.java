@@ -1,41 +1,69 @@
 public class MatrixSplitter {
 
-    private final int splitSize;
+   public int[][] splitRows(int[][] originalMatrix, int currentRow, int splitSize){
+       if(splitSize>= originalMatrix.length){
+           System.out.println("split size is equal to size of original matrix. Returning original matrix");
+           return originalMatrix;
+       }
+       else {
+           if (currentRow >= originalMatrix.length - 1) {
+               splitSize = 1;
+           }
+           int subRow = currentRow + splitSize;
 
-    public MatrixSplitter(int splitSize){
-        this.splitSize=splitSize;
+           int[][] newMatrix = new int[subRow][originalMatrix[0].length];
+
+           for (int i = currentRow; i <= subRow - 1; i++) {
+               for (int j = 0; j < originalMatrix[0].length; j++) {
+                   newMatrix[i][j] = originalMatrix[i][j];
+                   System.out.print(newMatrix[i][j] + " ");
+               }
+               System.out.println();
+           }
+           return newMatrix;
+       }
+   }
+    public int[][] splitByColumns(int[][] originalMatrix, int currentColumn, int splitSize) {
+       if(splitSize>= originalMatrix[0].length){
+           System.out.println("split size is equal to size of original matrix. Returning original matrix");
+           return originalMatrix;
+       }
+       else {
+           if (currentColumn >= originalMatrix[0].length - 1) {
+               splitSize = 1;
+           }
+           int subColumn = currentColumn + splitSize;
+
+           int[][] newMatrix = new int[originalMatrix.length][subColumn];
+
+           for (int i = 0; i < originalMatrix.length; i++) {
+               for (int j = currentColumn; j <= subColumn-1; j++) {
+                   newMatrix[i][j] = originalMatrix[i][j];
+                   System.out.print(newMatrix[i][j] + " ");
+               }
+               System.out.println();
+           }
+           return newMatrix;
+       }
     }
 
-    public int[][] splitBasedOnRow(int currentRow, int[][]matrixToBeSplitted){
-        int column= matrixToBeSplitted.length;
-        int row = currentRow+splitSize;
-        int[][] result= new int[row][column];
-        System.out.println("Splitting matrix A for split size: "+ splitSize);
-        for(int i=0; i<=row-1; i++) {
-            for(int j = 0; j<=column -1; j++){
-                result[i][j]=matrixToBeSplitted[i][j];
-                System.out.print(result[i][j]+" ");
-            }
-            System.out.println();
+    public static void main(String[] args) {
+        int[][] test= {{1,2},{3,4}, {5, 6}};
+        int splitSize=3;
+        MatrixSplitter matrixSplitter= new MatrixSplitter();
+        int currentRow=test.length;
+        for(int i=0; i<=currentRow-1;) {
+            System.out.println("split: "+ i);
+            matrixSplitter.splitRows(test, i, splitSize);
+            i+=splitSize;
         }
-        return result;
-    }
 
-    /*
-    unlike when splitting by rows, we don't have access to vertical width: number of rows. So, that's one extra input that the method needs.
-     */
-    public int[][] splitBasedOnColumn(int currentColumn,int[][]matrixToBeSplitted, int heightOfMatrix){
-        int column= currentColumn+splitSize;
-        int row= heightOfMatrix;
-        int[][] result= new int[row][column];
-        System.out.println("Splitting matrix B for split size: "+ splitSize);
-        for(int i=0; i<=row-1; i++) {
-            for(int j=0; j<=column-1; j++){
-                result[i][j]=matrixToBeSplitted[i][j];
-                System.out.print(result[i][j]+" ");
-            }
-            System.out.println();
+        int currentColumn=test[0].length;
+        for(int i=0; i<=currentColumn-1;) {
+            System.out.println("split: "+ i);
+            matrixSplitter.splitByColumns(test, i, splitSize);
+            i+=splitSize;
         }
-        return result;
+
     }
 }
