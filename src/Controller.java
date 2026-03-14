@@ -5,7 +5,7 @@ import java.util.concurrent.BlockingQueue;
 public class Controller {
 
 
-public static void main(String[] args) throws IOException {
+public static void main(String[] args) throws IOException, InterruptedException {
     AppConfig appConfig= LoadConfig.loadConfig(); //load config from the configuration file
 
     /*
@@ -16,6 +16,9 @@ public static void main(String[] args) throws IOException {
     int p=appConfig.getP();
     int splitSize=appConfig.getSplitSize();
     int maxBuffSize=appConfig.getMaxBuffSize();
+    int numConsumer=appConfig.getNumConsumer();
+    int maxProducerSleepTime=appConfig.getMaxProducerSleepTime();
+    int maxConsumerSleepTime=appConfig.getMaxConsumerSleepTime();
 
     /*
     create matrix
@@ -24,20 +27,13 @@ public static void main(String[] args) throws IOException {
 
     int[][] matrixA= matrixCreation.createMatrixA();
     int[][] matrixB= matrixCreation.createMatrixB();
+    int[][] matrixC= new int[m][p];
 
     /*
     Multiply two matrices normally
      */
-    NormalMatrixMultiplication normalMatrixMultiplication= new NormalMatrixMultiplication(matrixCreation);
-    normalMatrixMultiplication.matrixMultiplcation(matrixA, matrixB, m, p);
-
-    /*
-    Split matrix into sub-matrix
-    Requirements: size of matrix cannot be less than the splitSize: splitSize <= m && p
-     */
-    MatrixSplitter matrixSplitter= new MatrixSplitter(splitSize);
-    matrixSplitter.splitBasedOnRow(0, matrixA);
-    matrixSplitter.splitBasedOnColumn(0, matrixB,p);
+    NormalMatrixMultiplication normalMatrixMultiplication= new NormalMatrixMultiplication();
+    int[][] matrixCNormal= normalMatrixMultiplication.matrixMultiplication(matrixA, matrixB);
 
     /*
     Multiply the matrix after breaking it into smaller subunits.
@@ -45,12 +41,26 @@ public static void main(String[] args) throws IOException {
     BlockingQueue<WorkItem> sharedBuffer = new ArrayBlockingQueue<>(maxBuffSize);
 
     //Create Producer and Consumer Threads
-    Thread producerThread= new Thread(new Producer(sharedBuffer, matrixA, matrixB, p, splitSize));
-    Thread consumerThread = new Thread(new Consumer(sharedBuffer, normalMatrixMultiplication));
+    Thread producerThread= new Thread(new Producer(sharedBuffer, matrixA, matrixB, splitSize, numConsumer, maxProducerSleepTime));
 
+    Thread[] consumers = new Thread[numConsumer];
     //start the threads
     producerThread.start();
-    consumerThread.start();
 
+    for(int i=0; i<numConsumer; i++){
+        consumers[i]= new Thread(new Consumer(sharedBuffer, normalMatrixMultiplication,matrixC,  maxConsumerSleepTime));
+        consumers[i].start();
+    }
+    producerThread.join();
+    for(Thread t: consumers){
+        t.join();
+    }
+
+    PrintMatrix pm= new PrintMatrix();
+    System.out.println("Final Matrix C produced via Multithreading: ");
+    pm.printMatrix(matrixC);
+
+    System.out.println("Matrix C produced via 'for' loops ");
+    pm.printMatrix(matrixCNormal);
 }
 }
