@@ -1,21 +1,13 @@
 public class NormalMatrixMultiplication {
 
-    MatrixCreation matrixCreation;
-    public NormalMatrixMultiplication(MatrixCreation matrixCreation){
-        this.matrixCreation=matrixCreation;
-    }
-
-    public int [][] matrixMultiplcation(int[][]matrixA, int[][]matrixB, int rowC, int columnC){
-        int[][] matrixC = new int[rowC][columnC]; //rowC= rowA, columnC=columnB
-        System.out.println("Matrix C: ");
-        for(int i=0; i<=rowC-1; i++){
-            for(int j=0;j<=columnC-1; j++){
+    public int [][] matrixMultiplication(int[][]matrixA, int[][]matrixB){
+        int[][] matrixC = new int[matrixA.length][matrixB[0].length]; //rowC= rowA, columnC=columnB
+        for(int i=0; i<=matrixA.length-1; i++){
+            for(int j=0;j<=matrixB[0].length-1; j++){
                 for(int k=0; k<=matrixB.length-1; k++){
                     matrixC[i][j]+=matrixA[i][k]*matrixB[k][j];
                 }
-                System.out.print(matrixC[i][j]+" ");
             }
-            System.out.println();
         }
         return matrixC;
     }
