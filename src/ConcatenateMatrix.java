@@ -1,6 +1,7 @@
 public class ConcatenateMatrix {
 
     public int[][] concatenateMatrix(int[][]firstMatrix, int[][]secondMatrix){
+        ///
         // 1. Create a new result matrix with combined total rows
         int newTotalRows = firstMatrix.length + secondMatrix.length;
         int[][] result = new int[newTotalRows][];
