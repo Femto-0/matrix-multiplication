@@ -1,33 +1,66 @@
-import java.util.Arrays;
+import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 
-public class Consumer implements Runnable{
-    private final BlockingQueue<WorkItem> buffer;
-    private static int[][] previousMatrix=new int[0][];
-    WorkItem workItem= null;
-    NormalMatrixMultiplication normalMatrixMultiplication;
-    ConcatenateMatrix concatenateMatrix;
+public class Consumer implements Runnable {
 
-    public Consumer(BlockingQueue<WorkItem> buffer, NormalMatrixMultiplication normalMatrixMultiplication){
-        this.buffer=buffer;
-        this.normalMatrixMultiplication=normalMatrixMultiplication;
+    private final BlockingQueue<WorkItem> buffer;
+    private final NormalMatrixMultiplication multiplier;
+    private final int[][] matrixC;
+    private final int maxConsumerSleepTime;
+
+    private final Random rand = new Random();
+
+    public Consumer(BlockingQueue<WorkItem> buffer,
+                    NormalMatrixMultiplication multiplier,
+                    int[][] matrixC,
+                    int maxConsumerSleepTime) {
+
+        this.buffer = buffer;
+        this.multiplier = multiplier;
+        this.matrixC = matrixC;
+        this.maxConsumerSleepTime = maxConsumerSleepTime;
     }
 
     @Override
     public void run() {
+
         try {
-            workItem= buffer.take();
+
+            while (true) {
+
+                WorkItem item = buffer.take();
+
+                if (item.isDone()) {
+                    System.out.println(Thread.currentThread().getName() + " exiting");
+                    break;
+                }
+
+                int[][] subC = multiplier.matrixMultiplication(
+                        item.getSubA(),
+                        item.getSubB()
+                );
+
+                // place subC into final matrix C
+                for (int i = 0; i < subC.length; i++) {
+                    for (int j = 0; j < subC[0].length; j++) {
+
+                        matrixC[item.getLowA() + i][item.getLowB() + j] = subC[i][j];
+                    }
+                }
+
+                System.out.println(
+                        Thread.currentThread().getName() +
+                                " inserted block into C rows [" +
+                                item.getLowA() + "-" + item.getHighA() +
+                                "] cols [" +
+                                item.getLowB() + "-" + item.getHighB() + "]"
+                );
+
+                Thread.sleep(rand.nextInt(maxConsumerSleepTime));
+            }
+
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            Thread.currentThread().interrupt();
         }
-            int[][] subA= workItem.getSubA();
-            int[][] subB= workItem.getSubB();
-            int m= workItem.getLowA();
-            int n= workItem.getHighA();
-            int p= workItem.getHighB();
-            boolean done=workItem.isDone();
-            int [][] currentMatrix=normalMatrixMultiplication.matrixMultiplcation(subA, subB, m, p);
-            previousMatrix=concatenateMatrix.concatenateMatrix(previousMatrix, currentMatrix);
-            System.out.println("latest concatenated matrix: "+Arrays.deepToString(previousMatrix));
-        }
+    }
 }
