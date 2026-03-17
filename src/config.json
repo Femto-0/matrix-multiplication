@@ -1,10 +1,10 @@
 {
-  "m": 4,
+  "m": 10,
   "n": 4,
-  "p": 4,
-  "maxBuffSize": 5,
+  "p": 10,
+  "maxBuffSize": 2,
   "splitSize": 2,
-  "numConsumer": 2,
+  "numConsumer": 4,
   "maxProducerSleepTime": 20,
   "maxConsumerSleepTime": 80
 }

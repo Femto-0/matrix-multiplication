@@ -33,7 +33,10 @@ public static void main(String[] args) throws IOException, InterruptedException 
     Multiply two matrices normally
      */
     NormalMatrixMultiplication normalMatrixMultiplication= new NormalMatrixMultiplication();
+    long normalStartTime= System.currentTimeMillis();
     int[][] matrixCNormal= normalMatrixMultiplication.matrixMultiplication(matrixA, matrixB);
+    long normalStopTime= System.currentTimeMillis();
+    long normalTotalTime=normalStopTime-normalStartTime;
 
     /*
     Multiply the matrix after breaking it into smaller subunits.
@@ -44,6 +47,8 @@ public static void main(String[] args) throws IOException, InterruptedException 
     Thread producerThread= new Thread(new Producer(sharedBuffer, matrixA, matrixB, splitSize, numConsumer, maxProducerSleepTime));
 
     Thread[] consumers = new Thread[numConsumer];
+
+    long multiThreadingTimeStart= System.currentTimeMillis();
     //start the threads
     producerThread.start();
 
@@ -55,12 +60,16 @@ public static void main(String[] args) throws IOException, InterruptedException 
     for(Thread t: consumers){
         t.join();
     }
+    long multiThreadingTimeFinish=System.currentTimeMillis();
+    long multiThreadingTotalTime=multiThreadingTimeFinish-multiThreadingTimeStart;
 
     PrintMatrix pm= new PrintMatrix();
     System.out.println("Final Matrix C produced via Multithreading: ");
     pm.printMatrix(matrixC);
-
+    System.out.println("Time taken: "+ multiThreadingTotalTime+"ms");
+    System.out.println("---------------------------------------------------------------------");
     System.out.println("Matrix C produced via 'for' loops ");
     pm.printMatrix(matrixCNormal);
+    System.out.println("Time taken: "+ normalTotalTime+"ms");
 }
 }
