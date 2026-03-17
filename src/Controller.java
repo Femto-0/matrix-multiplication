@@ -33,10 +33,9 @@ public static void main(String[] args) throws IOException, InterruptedException 
     Multiply two matrices normally
      */
     NormalMatrixMultiplication normalMatrixMultiplication= new NormalMatrixMultiplication();
-    long normalStartTime= System.currentTimeMillis();
-    int[][] matrixCNormal= normalMatrixMultiplication.matrixMultiplication(matrixA, matrixB);
-    long normalStopTime= System.currentTimeMillis();
-    long normalTotalTime=normalStopTime-normalStartTime;
+    WorkItem workItem= normalMatrixMultiplication.matrixMultiplication(matrixA, matrixB);
+    int[][] matrixCNormal= workItem.getMatrix();
+    long normalTotalTime=workItem.getTime();
 
     /*
     Multiply the matrix after breaking it into smaller subunits.
@@ -65,11 +64,11 @@ public static void main(String[] args) throws IOException, InterruptedException 
 
     PrintMatrix pm= new PrintMatrix();
     System.out.println("Final Matrix C produced via Multithreading: ");
-    pm.printMatrix(matrixC);
     System.out.println("Time taken: "+ multiThreadingTotalTime+"ms");
+    pm.printMatrix(matrixC);
     System.out.println("---------------------------------------------------------------------");
     System.out.println("Matrix C produced via 'for' loops ");
-    pm.printMatrix(matrixCNormal);
     System.out.println("Time taken: "+ normalTotalTime+"ms");
+    pm.printMatrix(matrixCNormal);
 }
 }

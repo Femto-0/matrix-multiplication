@@ -11,6 +11,9 @@ public class WorkItem {
 
     private boolean done;
 
+    private int[][] matrix;
+    private long time;
+
     public WorkItem() {}
 
     public WorkItem(boolean done) {
@@ -25,6 +28,11 @@ public class WorkItem {
         this.lowB = lowB;
         this.highB = highB;
         this.done = false;
+    }
+
+    public WorkItem(int[][] matrix, long time){
+        this.matrix=matrix;
+        this.time=time;
     }
 
     public int[][] getSubA() { return subA; }
@@ -50,4 +58,13 @@ public class WorkItem {
 
     public boolean isDone() { return done; }
     public void setDone(boolean done) { this.done = done; }
+
+    public int[][] getMatrix() {
+        return matrix;
+    }
+
+    public long getTime() {
+        return time;
+    }
+
 }

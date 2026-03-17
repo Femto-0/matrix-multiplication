@@ -34,13 +34,10 @@ public class Consumer implements Runnable {
                     System.out.println(Thread.currentThread().getName() + " exiting");
                     break;
                 }
+                WorkItem workItem=multiplier.matrixMultiplication(item.getSubA(), item.getSubB());
+                int[][] subC = workItem.getMatrix();
 
-                int[][] subC = multiplier.matrixMultiplication(
-                        item.getSubA(),
-                        item.getSubB()
-                );
-
-                // place subC into final matrix C
+                //place subC into final matrix C
                 for (int i = 0; i < subC.length; i++) {
                     for (int j = 0; j < subC[0].length; j++) {
 
