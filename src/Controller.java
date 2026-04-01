@@ -7,6 +7,7 @@ public class Controller {
 
 public static void main(String[] args) throws IOException, InterruptedException {
     AppConfig appConfig= LoadConfig.loadConfig(); //load config from the configuration file
+    NormalMatrixMultiplication normalMatrixMultiplication= new NormalMatrixMultiplication();
 
     /*
     all the values from the configuration file
@@ -24,51 +25,97 @@ public static void main(String[] args) throws IOException, InterruptedException 
     create matrix
      */
     MatrixCreation matrixCreation= new MatrixCreation(appConfig, m, n, p);
-
     int[][] matrixA= matrixCreation.createMatrixA();
     int[][] matrixB= matrixCreation.createMatrixB();
     int[][] matrixC= new int[m][p];
 
     /*
-    Multiply two matrices normally
-     */
-    NormalMatrixMultiplication normalMatrixMultiplication= new NormalMatrixMultiplication();
-    WorkItem workItem= normalMatrixMultiplication.matrixMultiplication(matrixA, matrixB);
-    int[][] matrixCNormal= workItem.getMatrix();
-    long normalTotalTime=workItem.getTime();
-
-    /*
-    Multiply the matrix after breaking it into smaller subunits.
+    Multiply the matrix via. Producer-Consumer model.
      */
     BlockingQueue<WorkItem> sharedBuffer = new ArrayBlockingQueue<>(maxBuffSize);
 
-    //Create Producer and Consumer Threads
-    Thread producerThread= new Thread(new Producer(sharedBuffer, matrixA, matrixB, splitSize, numConsumer, maxProducerSleepTime));
+    Producer producer= new Producer(sharedBuffer, matrixA, matrixB, splitSize, numConsumer, maxProducerSleepTime);
+    Consumer[] consumerObjs = new Consumer[numConsumer];
 
+    //Create Producer and Consumer Threads
+    Thread producerThread= new Thread(producer);
     Thread[] consumers = new Thread[numConsumer];
 
-    long multiThreadingTimeStart= System.currentTimeMillis();
-    //start the threads
-    producerThread.start();
+    /*
+    Start the Producer and Consumer Threads
+     */
+
+    producerThread.start(); //start the producer thread
 
     for(int i=0; i<numConsumer; i++){
-        consumers[i]= new Thread(new Consumer(sharedBuffer, normalMatrixMultiplication,matrixC,  maxConsumerSleepTime));
-        consumers[i].start();
+        consumerObjs[i]= new Consumer(sharedBuffer, normalMatrixMultiplication, matrixC, maxConsumerSleepTime);
+        consumers[i]= new Thread(consumerObjs[i]);
+        consumers[i].start(); //start the consumer thread
     }
-    producerThread.join();
+    producerThread.join();   //shut down the producer thread
     for(Thread t: consumers){
-        t.join();
+        t.join();            //shut down the consumer thread
     }
-    long multiThreadingTimeFinish=System.currentTimeMillis();
-    long multiThreadingTotalTime=multiThreadingTimeFinish-multiThreadingTimeStart;
+
+    //calculating sleep time for Producer and Consumer Threads
+    int producerSleepTime=producer.getThreadSleepTime();
+    int consumerSleepTime = 0;
+
+    //calculating the total execution time
+    long producerExecutionTime= producer.getExecutionTime();
+    long consumerExecutionTime=0;
+
+    //buffer empty
+    int totalBufferEmpty=0;
+
+
+    for(Consumer consumer: consumerObjs){
+        consumerSleepTime+=consumer.getThreadSleepTime();
+        consumerExecutionTime+=consumer.getExecutionTime();
+        totalBufferEmpty+=consumer.getBufferEmptyCount();
+    }
+    int maxThreadSleepTime=producerSleepTime+consumerSleepTime;
+    long totalExecutionTime=producerExecutionTime+consumerExecutionTime;
 
     PrintMatrix pm= new PrintMatrix();
     System.out.println("Final Matrix C produced via Multithreading: ");
-    System.out.println("Time taken: "+ multiThreadingTotalTime+"ms");
+    //System.out.println("Time taken: "+ multiThreadingTotalTime+"ms");
     pm.printMatrix(matrixC);
-    System.out.println("---------------------------------------------------------------------");
+    System.out.println("---------------------------------------------");
+    System.out.println("| Producer/ Consumer Simulation Result");
+    System.out.println("| Simulation Time: "+ totalExecutionTime+"ms");
+
+    System.out.println("| Maximum Thread Sleep Time: "+ maxThreadSleepTime+ "ms");
+    System.out.println("| Number of Producer Threads: 1");
+    System.out.println("| Number of Consumer Threads: "+ numConsumer);
+    System.out.println("| Size of Buffer: "+ maxBuffSize);
+    System.out.println("| Total number of Items produced: "+ producer.getItemsProduced());
+    System.out.println("| Thread 0: "+ producer.getItemsProduced());
+    System.out.print("| Total number of Items consumed: ");
+    int totalNumberOfItems=0;
+    int[] countPerThread= new int[numConsumer];
+    for(int i=0; i<=numConsumer-1; i++){
+        int count=consumerObjs[i].getItemsConsumed();
+        totalNumberOfItems+=count;
+        countPerThread[i]=count;
+    }
+    System.out.println(totalNumberOfItems);
+    for(int i=0; i<=countPerThread.length-1; i++){
+        System.out.println("| Thread "+ (i+1)+": "+ countPerThread[i]);
+    }
+    System.out.println("| Number of times Buffer was full: "+ producer.getBufferFullCount());
+    System.out.println("| Number of times Buffer was empty: "+ totalBufferEmpty);
+    System.out.println("---------------------------------------------");
+     /*
+    Multiply two matrices normally
+     */
+    System.out.println("---------------------------------------------");
+    WorkItem workItem= normalMatrixMultiplication.matrixMultiplication(matrixA, matrixB);
+    int[][] matrixCNormal= workItem.getMatrix();
+    long normalTotalTime=workItem.getTime();
     System.out.println("Matrix C produced via 'for' loops ");
     System.out.println("Time taken: "+ normalTotalTime+"ms");
     pm.printMatrix(matrixCNormal);
+    System.out.println("---------------------------------------------");
 }
 }

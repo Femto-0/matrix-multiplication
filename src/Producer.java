@@ -10,15 +10,15 @@ public class Producer implements Runnable {
     private final int numConsumers;
     private final int maxProducerSleepTime;
 
+    private int threadSleepTime;
+    private long executionTime;
+
+    private int itemsProduced;
+    private int bufferFullCount;
+
     private final Random rand = new Random();
 
-    public Producer(BlockingQueue<WorkItem> buffer,
-                    int[][] A,
-                    int[][] B,
-                    int splitSize,
-                    int numConsumers,
-                    int maxProducerSleepTime) {
-
+    public Producer(BlockingQueue<WorkItem> buffer,int[][] A, int[][] B, int splitSize, int numConsumers, int maxProducerSleepTime) {
         this.buffer = buffer;
         this.A = A;
         this.B = B;
@@ -27,8 +27,29 @@ public class Producer implements Runnable {
         this.maxProducerSleepTime = maxProducerSleepTime;
     }
 
+
+    /*
+    getters and setters
+     */
+    public int getThreadSleepTime() {
+        return threadSleepTime;
+    }
+
+    public long getExecutionTime(){
+        return executionTime;
+    }
+
+    public int getItemsProduced(){
+        return itemsProduced;
+    }
+    public int getBufferFullCount(){
+        return bufferFullCount;
+    }
+
     @Override
     public void run() {
+
+        long startTime = System.currentTimeMillis();
 
         try {
 
@@ -39,9 +60,7 @@ public class Producer implements Runnable {
                 // build subA
                 int[][] subA = new int[rowSize][A[0].length];
                 for (int r = 0; r < rowSize; r++) {
-                    for (int c = 0; c < A[0].length; c++) {
-                        subA[r][c] = A[i + r][c];
-                    }
+                    System.arraycopy(A[i + r], 0, subA[r], 0, A[0].length);
                 }
 
                 for (int j = 0; j < B[0].length; j += splitSize) {
@@ -51,9 +70,7 @@ public class Producer implements Runnable {
                     // build subB
                     int[][] subB = new int[B.length][colSize];
                     for (int r = 0; r < B.length; r++) {
-                        for (int c = 0; c < colSize; c++) {
-                            subB[r][c] = B[r][j + c];
-                        }
+                        System.arraycopy(B[r], j, subB[r], 0, colSize);
                     }
 
                     WorkItem item = new WorkItem();
@@ -69,16 +86,21 @@ public class Producer implements Runnable {
 
                     item.setDone(false);
 
+                    if(buffer.remainingCapacity()==0){
+                        bufferFullCount++;
+                    }
                     buffer.put(item);
+                    itemsProduced++;
 
                     System.out.println(
-                            "Producer produced block A[" +
+                            "Producer "+Thread.currentThread().getName()+ " put rows A[" +
                                     item.getLowA() + "-" + item.getHighA() +
-                                    "] B[" +
-                                    item.getLowB() + "-" + item.getHighB() + "]"
+                                    "] and columns B[" +
+                                    item.getLowB() + "-" + item.getHighB() + "] to buffer"
                     );
-
-                    Thread.sleep(rand.nextInt(maxProducerSleepTime));
+                    int sleep= rand.nextInt(maxProducerSleepTime);
+                    threadSleepTime +=sleep;
+                    Thread.sleep(sleep);
                 }
             }
 
@@ -92,5 +114,7 @@ public class Producer implements Runnable {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
+        long endTime= System.currentTimeMillis();
+        executionTime=endTime- startTime;
     }
 }
