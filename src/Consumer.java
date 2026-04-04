@@ -15,6 +15,7 @@ public class Consumer implements Runnable {
     private int bufferEmptyCount;
 
     private final Random rand = new Random();
+    PrintMatrix printMatrix;
 
     public Consumer(BlockingQueue<WorkItem> buffer, NormalMatrixMultiplication multiplier, int[][] matrixC, int maxConsumerSleepTime) {
         this.buffer = buffer;
@@ -44,16 +45,24 @@ public class Consumer implements Runnable {
             while (true) {
                 if(buffer.isEmpty()){
                     bufferEmptyCount++;
+                    System.out.println("The queue is empty. Consumer : "+ Thread.currentThread().getName()+" is waiting...");
                 }
 
                 WorkItem item = buffer.take();
 
                 if (item.isDone()) {
-                    System.out.println(Thread.currentThread().getName() + " exiting");
+                    System.out.println("Consumer: "+Thread.currentThread().getName() + " exiting");
                     break;
                 }
                 WorkItem workItem=multiplier.matrixMultiplication(item.getSubA(), item.getSubB());
                 int[][] subC = workItem.getMatrix();
+
+                /*
+                The output is out of order because of following three lines. need to work on this
+                 */
+                String name= Thread.currentThread().getName()+" finished multiplying";
+                printMatrix= new PrintMatrix(subC, name);
+                printMatrix.printMatrix();
 
                 //place subC into final matrix C
                 for (int i = 0; i < subC.length; i++) {
@@ -61,7 +70,8 @@ public class Consumer implements Runnable {
                 }
 
                 System.out.println(
-                        Thread.currentThread().getName() +
+                        "Consumer "+
+                            Thread.currentThread().getName() +
                                 " inserted block into C rows [" +
                                 item.getLowA() + "-" + item.getHighA() +
                                 "] cols [" +

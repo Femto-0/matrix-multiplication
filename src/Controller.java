@@ -77,10 +77,9 @@ public static void main(String[] args) throws IOException, InterruptedException 
     int maxThreadSleepTime=producerSleepTime+consumerSleepTime;
     long totalExecutionTime=producerExecutionTime+consumerExecutionTime;
 
-    PrintMatrix pm= new PrintMatrix();
+    PrintMatrix pm= new PrintMatrix(matrixC, "Final Matrix");
     System.out.println("Final Matrix C produced via Multithreading: ");
-    //System.out.println("Time taken: "+ multiThreadingTotalTime+"ms");
-    pm.printMatrix(matrixC);
+    pm.printMatrix();
     System.out.println("---------------------------------------------");
     System.out.println("| Producer/ Consumer Simulation Result");
     System.out.println("| Simulation Time: "+ totalExecutionTime+"ms");
@@ -115,7 +114,7 @@ public static void main(String[] args) throws IOException, InterruptedException 
     long normalTotalTime=workItem.getTime();
     System.out.println("Matrix C produced via 'for' loops ");
     System.out.println("Time taken: "+ normalTotalTime+"ms");
-    pm.printMatrix(matrixCNormal);
+    pm.printMatrix();
     System.out.println("---------------------------------------------");
 }
 }
