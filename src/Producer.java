@@ -1,3 +1,5 @@
+import org.slf4j.Logger;
+
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 
@@ -16,15 +18,17 @@ public class Producer implements Runnable {
     private int itemsProduced;
     private int bufferFullCount;
 
+    private Logger logger;
     private final Random rand = new Random();
 
-    public Producer(BlockingQueue<WorkItem> buffer,int[][] A, int[][] B, int splitSize, int numConsumers, int maxProducerSleepTime) {
+    public Producer(BlockingQueue<WorkItem> buffer, int[][] A, int[][] B, int splitSize, int numConsumers, int maxProducerSleepTime, Logger logger) {
         this.buffer = buffer;
         this.A = A;
         this.B = B;
         this.splitSize = splitSize;
         this.numConsumers = numConsumers;
         this.maxProducerSleepTime = maxProducerSleepTime;
+        this.logger=logger;
     }
 
 
@@ -92,12 +96,17 @@ public class Producer implements Runnable {
                     buffer.put(item);
                     itemsProduced++;
 
-                    System.out.println(
+                    logger.debug(
                             "Producer "+Thread.currentThread().getName()+ " put rows A[" +
                                     item.getLowA() + "-" + item.getHighA() +
                                     "] and columns B[" +
-                                    item.getLowB() + "-" + item.getHighB() + "] to buffer"
-                    );
+                                    item.getLowB() + "-" + item.getHighB() + "] to buffer");
+//                    System.out.println(
+//                            "Producer "+Thread.currentThread().getName()+ " put rows A[" +
+//                                    item.getLowA() + "-" + item.getHighA() +
+//                                    "] and columns B[" +
+//                                    item.getLowB() + "-" + item.getHighB() + "] to buffer"
+//                    );
                     int sleep= rand.nextInt(maxProducerSleepTime);
                     threadSleepTime +=sleep;
                     Thread.sleep(sleep);

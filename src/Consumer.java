@@ -1,5 +1,9 @@
+import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
 
 public class Consumer implements Runnable {
 
@@ -15,13 +19,15 @@ public class Consumer implements Runnable {
     private int bufferEmptyCount;
 
     private final Random rand = new Random();
-    PrintMatrix printMatrix;
+    private final Logger logger;
 
-    public Consumer(BlockingQueue<WorkItem> buffer, NormalMatrixMultiplication multiplier, int[][] matrixC, int maxConsumerSleepTime) {
+
+    public Consumer(BlockingQueue<WorkItem> buffer, NormalMatrixMultiplication multiplier, int[][] matrixC, int maxConsumerSleepTime, Logger logger) {
         this.buffer = buffer;
         this.multiplier = multiplier;
         this.matrixC = matrixC;
         this.maxConsumerSleepTime = maxConsumerSleepTime;
+        this.logger=logger;
     }
 
     public int getThreadSleepTime(){
@@ -45,13 +51,14 @@ public class Consumer implements Runnable {
             while (true) {
                 if(buffer.isEmpty()){
                     bufferEmptyCount++;
-                    System.out.println("The queue is empty. Consumer : "+ Thread.currentThread().getName()+" is waiting...");
+                    logger.debug("....The queue is empty. Consumer {} is waiting...",
+                            Thread.currentThread().getName());
                 }
 
                 WorkItem item = buffer.take();
 
                 if (item.isDone()) {
-                    System.out.println("Consumer: "+Thread.currentThread().getName() + " exiting");
+                    logger.debug("Consumer {} exiting", Thread.currentThread().getName());
                     break;
                 }
                 WorkItem workItem=multiplier.matrixMultiplication(item.getSubA(), item.getSubB());
@@ -60,23 +67,26 @@ public class Consumer implements Runnable {
                 /*
                 The output is out of order because of following three lines. need to work on this
                  */
-                String name= Thread.currentThread().getName()+" finished multiplying";
-                printMatrix= new PrintMatrix(subC, name);
-                printMatrix.printMatrix();
+                String subA=Arrays.stream(item.getSubA())
+                        .map(Arrays::toString)
+                        .collect(Collectors.joining("\n"));
+                String subB=Arrays.stream(item.getSubB())
+                        .map(Arrays::toString)
+                        .collect(Collectors.joining("\n"));
+                String subC_Calculation =  Arrays.stream(subC)
+                        .map(Arrays::toString)
+                        .collect(Collectors.joining("\n"));
+                logger.debug("Consumer {} finished multiplying {}{} {}*{}{}{}and got result: {}{}",Thread.currentThread().getName(), "\n", subA,"\n","\n", subB,"\n", "\n" , subC_Calculation);
 
                 //place subC into final matrix C
                 for (int i = 0; i < subC.length; i++) {
                     System.arraycopy(subC[i], 0, matrixC[item.getLowA() + i], item.getLowB(), subC[0].length);
                 }
-
-                System.out.println(
-                        "Consumer "+
-                            Thread.currentThread().getName() +
-                                " inserted block into C rows [" +
-                                item.getLowA() + "-" + item.getHighA() +
-                                "] cols [" +
-                                item.getLowB() + "-" + item.getHighB() + "]"
-                );
+                logger.debug("Consumer {} inserted calculated block into matrix C: " +
+                                "Rows [{} - {}] and Cols [{} - {}]",
+                                Thread.currentThread().getName(),
+                                item.getLowA(), item.getHighA(),
+                                item.getLowB(), item.getHighB());
                 itemsConsumed++;
                 int sleep= rand.nextInt(maxConsumerSleepTime);
                 threadSleepTime +=sleep;

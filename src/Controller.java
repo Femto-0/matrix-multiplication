@@ -1,13 +1,15 @@
 import java.io.IOException;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-
+import org.slf4j.*;
 public class Controller {
 
 
 public static void main(String[] args) throws IOException, InterruptedException {
     AppConfig appConfig= LoadConfig.loadConfig(); //load config from the configuration file
     NormalMatrixMultiplication normalMatrixMultiplication= new NormalMatrixMultiplication();
+    PrintMatrix printMatrix = new PrintMatrix();
+    Logger logger= LoggerFactory.getLogger(Controller.class);
 
     /*
     all the values from the configuration file
@@ -34,7 +36,7 @@ public static void main(String[] args) throws IOException, InterruptedException 
      */
     BlockingQueue<WorkItem> sharedBuffer = new ArrayBlockingQueue<>(maxBuffSize);
 
-    Producer producer= new Producer(sharedBuffer, matrixA, matrixB, splitSize, numConsumer, maxProducerSleepTime);
+    Producer producer= new Producer(sharedBuffer, matrixA, matrixB, splitSize, numConsumer, maxProducerSleepTime, logger);
     Consumer[] consumerObjs = new Consumer[numConsumer];
 
     //Create Producer and Consumer Threads
@@ -48,7 +50,7 @@ public static void main(String[] args) throws IOException, InterruptedException 
     producerThread.start(); //start the producer thread
 
     for(int i=0; i<numConsumer; i++){
-        consumerObjs[i]= new Consumer(sharedBuffer, normalMatrixMultiplication, matrixC, maxConsumerSleepTime);
+        consumerObjs[i]= new Consumer(sharedBuffer, normalMatrixMultiplication, matrixC, maxConsumerSleepTime, logger);
         consumers[i]= new Thread(consumerObjs[i]);
         consumers[i].start(); //start the consumer thread
     }
@@ -77,9 +79,7 @@ public static void main(String[] args) throws IOException, InterruptedException 
     int maxThreadSleepTime=producerSleepTime+consumerSleepTime;
     long totalExecutionTime=producerExecutionTime+consumerExecutionTime;
 
-    PrintMatrix pm= new PrintMatrix(matrixC, "Final Matrix");
-    System.out.println("Final Matrix C produced via Multithreading: ");
-    pm.printMatrix();
+    printMatrix.printMatrix(matrixC, "Final Matrix produced via. Multithreading");
     System.out.println("---------------------------------------------");
     System.out.println("| Producer/ Consumer Simulation Result");
     System.out.println("| Simulation Time: "+ totalExecutionTime+"ms");
@@ -112,9 +112,8 @@ public static void main(String[] args) throws IOException, InterruptedException 
     WorkItem workItem= normalMatrixMultiplication.matrixMultiplication(matrixA, matrixB);
     int[][] matrixCNormal= workItem.getMatrix();
     long normalTotalTime=workItem.getTime();
-    System.out.println("Matrix C produced via 'for' loops ");
+    printMatrix.printMatrix(matrixCNormal, "Final matrix produced using for loops");
     System.out.println("Time taken: "+ normalTotalTime+"ms");
-    pm.printMatrix();
     System.out.println("---------------------------------------------");
 }
 }
