@@ -1,6 +1,8 @@
 import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -12,8 +14,8 @@ public class Consumer implements Runnable {
     private final int[][] matrixC;
     private final int maxConsumerSleepTime;
 
-    private int threadSleepTime;
-    private long executionTime;
+    private AtomicInteger threadSleepTime = new AtomicInteger();
+    private AtomicLong executionTime = new AtomicLong();
 
     private int itemsConsumed;
     private int bufferEmptyCount;
@@ -30,10 +32,10 @@ public class Consumer implements Runnable {
         this.logger=logger;
     }
 
-    public int getThreadSleepTime(){
+    public AtomicInteger getThreadSleepTime(){
         return threadSleepTime;
     }
-    public long getExecutionTime(){
+    public AtomicLong getExecutionTime(){
         return executionTime;
     }
     public int getItemsConsumed(){
@@ -89,7 +91,7 @@ public class Consumer implements Runnable {
                                 item.getLowB(), item.getHighB());
                 itemsConsumed++;
                 int sleep= rand.nextInt(maxConsumerSleepTime);
-                threadSleepTime +=sleep;
+                threadSleepTime.addAndGet(sleep);
                 Thread.sleep(sleep);
             }
 
@@ -97,7 +99,7 @@ public class Consumer implements Runnable {
             Thread.currentThread().interrupt();
         }
         long endTime= System.currentTimeMillis();
-        executionTime=endTime- startTime;
+        executionTime.addAndGet(endTime-startTime);
     }
 
 }

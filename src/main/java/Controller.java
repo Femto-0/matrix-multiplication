@@ -1,6 +1,9 @@
 import java.io.IOException;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
+
 import org.slf4j.*;
 public class Controller {
 
@@ -60,31 +63,39 @@ public static void main(String[] args) throws IOException, InterruptedException 
     }
 
     //calculating sleep time for Producer and Consumer Threads
-    int producerSleepTime=producer.getThreadSleepTime();
-    int consumerSleepTime = 0;
+    AtomicInteger producerSleepTime=producer.getThreadSleepTime();
+    AtomicInteger consumerSleepTime= new AtomicInteger(0);
 
     //calculating the total execution time
-    long producerExecutionTime= producer.getExecutionTime();
-    long consumerExecutionTime=0;
+    AtomicLong producerExecutionTime= producer.getExecutionTime();
+    AtomicLong consumerExecutionTime= new AtomicLong(0);
 
     //buffer empty
     int totalBufferEmpty=0;
 
 
     for(Consumer consumer: consumerObjs){
-        consumerSleepTime+=consumer.getThreadSleepTime();
-        consumerExecutionTime+=consumer.getExecutionTime();
+        AtomicInteger currentThreadSleepTime= consumer.getThreadSleepTime();
+        consumerSleepTime.getAndAdd(currentThreadSleepTime.get());
+
+        AtomicLong currentExecutionTime= consumer.getExecutionTime();
+        consumerExecutionTime.addAndGet(currentExecutionTime.get());
+
         totalBufferEmpty+=consumer.getBufferEmptyCount();
     }
-    int maxThreadSleepTime=producerSleepTime+consumerSleepTime;
-    long totalExecutionTime=producerExecutionTime+consumerExecutionTime;
+
+    int finalConsumerSleepTime= consumerSleepTime.get();
+    long finalConsumerExecutionTime= consumerExecutionTime.get();
+
+    int totalThreadSleepTime= producerSleepTime.addAndGet(finalConsumerSleepTime);
+    long totalExecutionTime= producerExecutionTime.addAndGet(finalConsumerExecutionTime);
 
     printMatrix.printMatrix(matrixC, "Final Matrix produced via. Multithreading");
     System.out.println("---------------------------------------------");
     System.out.println("| Producer/ Consumer Simulation Result");
     System.out.println("| Simulation Time: "+ totalExecutionTime+"ms");
 
-    System.out.println("| Maximum Thread Sleep Time: "+ maxThreadSleepTime+ "ms");
+    System.out.println("| Maximum Thread Sleep Time: "+ totalThreadSleepTime+ "ms");
     System.out.println("| Number of Producer Threads: 1");
     System.out.println("| Number of Consumer Threads: "+ numConsumer);
     System.out.println("| Size of Buffer: "+ maxBuffSize);

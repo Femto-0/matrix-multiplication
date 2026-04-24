@@ -2,6 +2,8 @@ import org.slf4j.Logger;
 
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class Producer implements Runnable {
 
@@ -12,8 +14,8 @@ public class Producer implements Runnable {
     private final int numConsumers;
     private final int maxProducerSleepTime;
 
-    private int threadSleepTime;
-    private long executionTime;
+    private AtomicInteger threadSleepTime= new AtomicInteger();
+    private AtomicLong executionTime= new AtomicLong();
 
     private int itemsProduced;
     private int bufferFullCount;
@@ -35,11 +37,11 @@ public class Producer implements Runnable {
     /*
     getters and setters
      */
-    public int getThreadSleepTime() {
+    public AtomicInteger getThreadSleepTime() {
         return threadSleepTime;
     }
 
-    public long getExecutionTime(){
+    public AtomicLong getExecutionTime(){
         return executionTime;
     }
 
@@ -106,9 +108,9 @@ public class Producer implements Runnable {
 //                                    item.getLowA() + "-" + item.getHighA() +
 //                                    "] and columns B[" +
 //                                    item.getLowB() + "-" + item.getHighB() + "] to buffer"
-//                    );
+//                    )2;
                     int sleep= rand.nextInt(maxProducerSleepTime);
-                    threadSleepTime +=sleep;
+                    threadSleepTime.addAndGet(sleep);
                     Thread.sleep(sleep);
                 }
             }
@@ -124,6 +126,6 @@ public class Producer implements Runnable {
             Thread.currentThread().interrupt();
         }
         long endTime= System.currentTimeMillis();
-        executionTime=endTime- startTime;
+        executionTime.addAndGet(endTime-startTime);
     }
 }
