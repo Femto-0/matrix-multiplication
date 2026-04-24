@@ -1,0 +1,93 @@
+2026-04-23 23:24:34 - Matrix A: 
+[1, 5, 4, 9]
+[9, 9, 4, 9]
+[6, 1, 6, 4]
+[1, 5, 0, 2]
+2026-04-23 23:24:34 - Matrix B: 
+[9, 4, 1, 8]
+[8, 4, 7, 6]
+[3, 7, 6, 1]
+[7, 4, 1, 9]
+2026-04-23 23:24:34 - ....The queue is empty. Consumer Thread-1 is waiting...
+2026-04-23 23:24:34 - Consumer Thread-2 finished multiplying 
+[1, 5, 4, 9]
+[9, 9, 4, 9] 
+*
+[9, 4]
+[8, 4]
+[3, 7]
+[7, 4]
+and got result: 
+[124, 88]
+[228, 136]
+2026-04-23 23:24:34 - Consumer Thread-2 inserted calculated block into matrix C: Rows [0 - 1] and Cols [0 - 1]
+2026-04-23 23:24:34 - Producer Thread-0 put rows A[0-1] and columns B[0-1] to buffer
+2026-04-23 23:24:34 - Producer Thread-0 put rows A[0-1] and columns B[2-3] to buffer
+2026-04-23 23:24:34 - Producer Thread-0 put rows A[2-3] and columns B[0-1] to buffer
+2026-04-23 23:24:34 - Producer Thread-0 put rows A[2-3] and columns B[2-3] to buffer
+2026-04-23 23:24:34 - Consumer Thread-1 finished multiplying 
+[1, 5, 4, 9]
+[9, 9, 4, 9] 
+*
+[1, 8]
+[7, 6]
+[6, 1]
+[1, 9]
+and got result: 
+[69, 123]
+[105, 211]
+2026-04-23 23:24:34 - Consumer Thread-1 inserted calculated block into matrix C: Rows [0 - 1] and Cols [2 - 3]
+2026-04-23 23:24:34 - Consumer Thread-2 finished multiplying 
+[6, 1, 6, 4]
+[1, 5, 0, 2] 
+*
+[9, 4]
+[8, 4]
+[3, 7]
+[7, 4]
+and got result: 
+[108, 86]
+[63, 32]
+2026-04-23 23:24:34 - Consumer Thread-2 inserted calculated block into matrix C: Rows [2 - 3] and Cols [0 - 1]
+2026-04-23 23:24:34 - Consumer Thread-2 finished multiplying 
+[6, 1, 6, 4]
+[1, 5, 0, 2] 
+*
+[1, 8]
+[7, 6]
+[6, 1]
+[1, 9]
+and got result: 
+[53, 96]
+[38, 56]
+2026-04-23 23:24:34 - Consumer Thread-2 inserted calculated block into matrix C: Rows [2 - 3] and Cols [2 - 3]
+2026-04-23 23:24:34 - Consumer Thread-2 exiting
+2026-04-23 23:24:34 - Consumer Thread-1 exiting
+2026-04-23 23:24:34 - Final Matrix produced via. Multithreading: 
+[124, 88, 69, 123]
+[228, 136, 105, 211]
+[108, 86, 53, 96]
+[63, 32, 38, 56]
+2026-04-23 23:24:34 - -------------------------------------------
+2026-04-23 23:24:34 - | Producer/ Consumer Simulation Result
+2026-04-23 23:24:34 - | Simulation Time: 32ms
+2026-04-23 23:24:34 - | Maximum Thread Sleep Time: 15ms
+2026-04-23 23:24:34 - | Number of Producer Threads: 1
+2026-04-23 23:24:34 - | Number of Consumer Threads: 2
+2026-04-23 23:24:34 - | Size of Buffer: 2 
+2026-04-23 23:24:34 - | Total number of Items produced: 4 
+2026-04-23 23:24:34 - | Thread 0: 4
+2026-04-23 23:24:34 - | Total number of Items consumed: 4
+2026-04-23 23:24:34 - | Thread 1: 1
+2026-04-23 23:24:34 - | Thread 2: 3
+2026-04-23 23:24:34 - | Number of times Buffer was full: 0 
+2026-04-23 23:24:34 - | Number of times Buffer was empty: 1
+2026-04-23 23:24:34 - ---------------------------------------------
+2026-04-23 23:24:34 - ---------------------------------------------
+2026-04-23 23:24:34 - Final matrix produced using for loops: 
+[124, 88, 69, 123]
+[228, 136, 105, 211]
+[108, 86, 53, 96]
+[63, 32, 38, 56]
+2026-04-23 23:24:34 - Time taken: 0ms
+2026-04-23 23:24:34 - ---------------------------------------------
