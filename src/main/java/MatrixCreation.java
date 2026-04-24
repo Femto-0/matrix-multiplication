@@ -6,7 +6,6 @@ public class MatrixCreation {
     private final int n; //number of columns in Matrix A or rows in Matrix B
     private final int p; //number of columns in Matrix B
 
-    PrintMatrix printMatrix= new PrintMatrix();
     Random rand= new Random();
 
     public MatrixCreation(AppConfig appConfig, int m, int n, int p){
@@ -23,7 +22,6 @@ public class MatrixCreation {
                 matrixA[i][j] = rand.nextInt(10);
             }
         }
-        printMatrix.printMatrix(matrixA,"First Matrix: ");
         return matrixA;
     }
 
@@ -34,7 +32,6 @@ public class MatrixCreation {
                 matirxB[i][j] = rand.nextInt(10);
             }
         }
-        printMatrix.printMatrix(matirxB, "Second Matrix: ");
         return matirxB;
     }
 

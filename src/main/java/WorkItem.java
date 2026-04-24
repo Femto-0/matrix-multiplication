@@ -16,19 +16,6 @@ public class WorkItem {
 
     public WorkItem() {}
 
-    public WorkItem(boolean done) {
-        this.done = done;
-    }
-
-    public WorkItem(int[][] subA, int[][] subB, int lowA, int highA, int lowB, int highB) {
-        this.subA = subA;
-        this.subB = subB;
-        this.lowA = lowA;
-        this.highA = highA;
-        this.lowB = lowB;
-        this.highB = highB;
-        this.done = false;
-    }
 
     public WorkItem(int[][] matrix, long time){
         this.matrix=matrix;
@@ -40,9 +27,6 @@ public class WorkItem {
 
     public int[][] getSubB() { return subB; }
     public void setSubB(int[][] subB) { this.subB = subB; }
-
-    public int[][] getSubC() { return subC; }
-    public void setSubC(int[][] subC) { this.subC = subC; }
 
     public int getLowA() { return lowA; }
     public void setLowA(int lowA) { this.lowA = lowA; }

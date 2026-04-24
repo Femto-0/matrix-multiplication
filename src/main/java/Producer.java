@@ -14,13 +14,13 @@ public class Producer implements Runnable {
     private final int numConsumers;
     private final int maxProducerSleepTime;
 
-    private AtomicInteger threadSleepTime= new AtomicInteger();
-    private AtomicLong executionTime= new AtomicLong();
+    private final AtomicInteger threadSleepTime= new AtomicInteger();
+    private final AtomicLong executionTime= new AtomicLong();
 
     private int itemsProduced;
     private int bufferFullCount;
 
-    private Logger logger;
+    private final Logger logger;
     private final Random rand = new Random();
 
     public Producer(BlockingQueue<WorkItem> buffer, int[][] A, int[][] B, int splitSize, int numConsumers, int maxProducerSleepTime, Logger logger) {
@@ -103,12 +103,6 @@ public class Producer implements Runnable {
                                     item.getLowA() + "-" + item.getHighA() +
                                     "] and columns B[" +
                                     item.getLowB() + "-" + item.getHighB() + "] to buffer");
-//                    System.out.println(
-//                            "Producer "+Thread.currentThread().getName()+ " put rows A[" +
-//                                    item.getLowA() + "-" + item.getHighA() +
-//                                    "] and columns B[" +
-//                                    item.getLowB() + "-" + item.getHighB() + "] to buffer"
-//                    )2;
                     int sleep= rand.nextInt(maxProducerSleepTime);
                     threadSleepTime.addAndGet(sleep);
                     Thread.sleep(sleep);

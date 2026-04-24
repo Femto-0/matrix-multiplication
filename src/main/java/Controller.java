@@ -1,8 +1,10 @@
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 import org.slf4j.*;
 public class Controller {
@@ -11,7 +13,6 @@ public class Controller {
 public static void main(String[] args) throws IOException, InterruptedException {
     AppConfig appConfig= LoadConfig.loadConfig(); //load config from the configuration file
     NormalMatrixMultiplication normalMatrixMultiplication= new NormalMatrixMultiplication();
-    PrintMatrix printMatrix = new PrintMatrix();
     Logger logger= LoggerFactory.getLogger(Controller.class);
 
     /*
@@ -32,6 +33,17 @@ public static void main(String[] args) throws IOException, InterruptedException 
     MatrixCreation matrixCreation= new MatrixCreation(appConfig, m, n, p);
     int[][] matrixA= matrixCreation.createMatrixA();
     int[][] matrixB= matrixCreation.createMatrixB();
+
+    String matrixA_String=Arrays.stream(matrixA)
+            .map(Arrays::toString)
+            .collect(Collectors.joining("\n"));
+    logger.debug("Matrix A: {}{}", "\n", matrixA_String);
+
+    String matrixB_String=Arrays.stream(matrixB)
+            .map(Arrays::toString)
+            .collect(Collectors.joining("\n"));
+    logger.debug("Matrix B: {}{}", "\n", matrixB_String);
+
     int[][] matrixC= new int[m][p];
 
     /*
@@ -90,18 +102,19 @@ public static void main(String[] args) throws IOException, InterruptedException 
     int totalThreadSleepTime= producerSleepTime.addAndGet(finalConsumerSleepTime);
     long totalExecutionTime= producerExecutionTime.addAndGet(finalConsumerExecutionTime);
 
-    printMatrix.printMatrix(matrixC, "Final Matrix produced via. Multithreading");
-    System.out.println("---------------------------------------------");
-    System.out.println("| Producer/ Consumer Simulation Result");
-    System.out.println("| Simulation Time: "+ totalExecutionTime+"ms");
-
-    System.out.println("| Maximum Thread Sleep Time: "+ totalThreadSleepTime+ "ms");
-    System.out.println("| Number of Producer Threads: 1");
-    System.out.println("| Number of Consumer Threads: "+ numConsumer);
-    System.out.println("| Size of Buffer: "+ maxBuffSize);
-    System.out.println("| Total number of Items produced: "+ producer.getItemsProduced());
-    System.out.println("| Thread 0: "+ producer.getItemsProduced());
-    System.out.print("| Total number of Items consumed: ");
+    String matrixC_String=Arrays.stream(matrixC)
+            .map(Arrays::toString)
+            .collect(Collectors.joining("\n"));
+    logger.debug("Final Matrix produced via. Multithreading: {}{}", "\n", matrixC_String);
+    logger.debug("-------------------------------------------");
+    logger.debug("| Producer/ Consumer Simulation Result");
+    logger.debug("| Simulation Time: {}ms", totalExecutionTime);
+    logger.debug("| Maximum Thread Sleep Time: {}ms", totalThreadSleepTime);
+    logger.debug("| Number of Producer Threads: 1");
+    logger.debug("| Number of Consumer Threads: {}", numConsumer);
+    logger.debug("| Size of Buffer: {} ", maxBuffSize);
+    logger.debug("| Total number of Items produced: {} ", producer.getItemsProduced());
+    logger.debug("| Thread 0: {}", producer.getItemsProduced());
     int totalNumberOfItems=0;
     int[] countPerThread= new int[numConsumer];
     for(int i=0; i<=numConsumer-1; i++){
@@ -109,22 +122,24 @@ public static void main(String[] args) throws IOException, InterruptedException 
         totalNumberOfItems+=count;
         countPerThread[i]=count;
     }
-    System.out.println(totalNumberOfItems);
+    logger.debug("| Total number of Items consumed: {}", totalNumberOfItems);
     for(int i=0; i<=countPerThread.length-1; i++){
-        System.out.println("| Thread "+ (i+1)+": "+ countPerThread[i]);
+        logger.debug("| Thread {}: {}", (i+1), countPerThread[i]);
     }
-    System.out.println("| Number of times Buffer was full: "+ producer.getBufferFullCount());
-    System.out.println("| Number of times Buffer was empty: "+ totalBufferEmpty);
-    System.out.println("---------------------------------------------");
+    logger.debug("| Number of times Buffer was full: {} ", producer.getBufferFullCount());
+    logger.debug("| Number of times Buffer was empty: {}",  totalBufferEmpty);
+    logger.debug("---------------------------------------------");
      /*
     Multiply two matrices normally
      */
-    System.out.println("---------------------------------------------");
+    logger.debug("---------------------------------------------");
     WorkItem workItem= normalMatrixMultiplication.matrixMultiplication(matrixA, matrixB);
-    int[][] matrixCNormal= workItem.getMatrix();
     long normalTotalTime=workItem.getTime();
-    printMatrix.printMatrix(matrixCNormal, "Final matrix produced using for loops");
-    System.out.println("Time taken: "+ normalTotalTime+"ms");
-    System.out.println("---------------------------------------------");
+    String matrixCNormal= Arrays.stream(workItem.getMatrix())
+            .map(Arrays::toString)
+            .collect(Collectors.joining("\n"));
+    logger.debug("Final matrix produced using for loops: {}{}", "\n", matrixCNormal);
+    logger.debug("Time taken: {}ms", normalTotalTime);
+    logger.debug("---------------------------------------------");
 }
 }

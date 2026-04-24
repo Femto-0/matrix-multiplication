@@ -7,6 +7,6 @@ public class LoadConfig {
 
     public static AppConfig loadConfig() throws IOException {
         ObjectMapper objectMapper= new ObjectMapper();
-        return objectMapper.readValue(new File("src/config.json"), AppConfig.class);
+        return objectMapper.readValue(new File("src/main/java/config.json"), AppConfig.class);
     }
 }
