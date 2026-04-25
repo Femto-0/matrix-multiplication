@@ -1,7 +1,7 @@
 <configuration>
 
     <!-- File Appender -->
-    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+    <appender name="FILE-A" class="ch.qos.logback.core.FileAppender">
         <!-- Output file -->
         <file>logs/app-log.txt</file>
 
@@ -14,9 +14,25 @@
         </encoder>
     </appender>
 
-    <!-- Root logger -->
-    <root level="DEBUG">
-        <appender-ref ref="FILE"/>
+    <appender name="FILE-B" class="ch.qos.logback.core.FileAppender">
+        <file>logs/concise-log.txt</file>
+        <append>true</append>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="logger.program" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE-A" />
+    </logger>
+
+    <logger name="logger.concise" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE-B" />
+    </logger>
+
+    <!---Root logger for everything else-->
+    <root level="error">
+        <appender-ref ref="FILE-A" />
     </root>
 
 </configuration>
