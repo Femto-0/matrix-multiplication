@@ -13,7 +13,8 @@ public class Controller {
 public static void main(String[] args) throws IOException, InterruptedException {
     AppConfig appConfig= LoadConfig.loadConfig(); //load config from the configuration file
     NormalMatrixMultiplication normalMatrixMultiplication= new NormalMatrixMultiplication();
-    Logger logger= LoggerFactory.getLogger(Controller.class);
+    Logger logger= LoggerFactory.getLogger("logger.program");
+    Logger conciseLogger = LoggerFactory.getLogger("logger.concise");
 
     /*
     all the values from the configuration file
@@ -106,15 +107,26 @@ public static void main(String[] args) throws IOException, InterruptedException 
             .map(Arrays::toString)
             .collect(Collectors.joining("\n"));
     logger.debug("Final Matrix produced via. Multithreading: {}{}", "\n", matrixC_String);
-    logger.debug("-------------------------------------------");
-    logger.debug("| Producer/ Consumer Simulation Result");
-    logger.debug("| Simulation Time: {}ms", totalExecutionTime);
-    logger.debug("| Maximum Thread Sleep Time: {}ms", totalThreadSleepTime);
-    logger.debug("| Number of Producer Threads: 1");
-    logger.debug("| Number of Consumer Threads: {}", numConsumer);
-    logger.debug("| Size of Buffer: {} ", maxBuffSize);
-    logger.debug("| Total number of Items produced: {} ", producer.getItemsProduced());
-    logger.debug("| Thread 0: {}", producer.getItemsProduced());
+    conciseLogger.debug("-----------------START OF REPORT--------------------------");
+
+    conciseLogger.debug("{Config:");
+    conciseLogger.debug("   'm': {}", m);
+    conciseLogger.debug("   'n': {}", n);
+    conciseLogger.debug("   'p': {}", p);
+    conciseLogger.debug("   'Max Buff Size': {}", maxBuffSize);
+    conciseLogger.debug("   'Split Size': {}", splitSize);
+    conciseLogger.debug("   'Number of Consumer': {}", numConsumer);
+    conciseLogger.debug("   'Maximum Producer Sleep Time': {}", maxProducerSleepTime);
+    conciseLogger.debug("   'Maximum Consumer Sleep Time': {}", maxConsumerSleepTime);
+    conciseLogger.debug("Report: ");
+    conciseLogger.debug("   Producer/ Consumer Simulation Result");
+    conciseLogger.debug("   Simulation Time: {}ms", totalExecutionTime);
+    conciseLogger.debug("   Maximum Thread Sleep Time: {}ms", totalThreadSleepTime);
+    conciseLogger.debug("   Number of Producer Threads: 1");
+    conciseLogger.debug("   Number of Consumer Threads: {}", numConsumer);
+    conciseLogger.debug("   Size of Buffer: {} ", maxBuffSize);
+    conciseLogger.debug("   Total number of Items produced: {} ", producer.getItemsProduced());
+    conciseLogger.debug("   Thread 0: {}", producer.getItemsProduced());
     int totalNumberOfItems=0;
     int[] countPerThread= new int[numConsumer];
     for(int i=0; i<=numConsumer-1; i++){
@@ -122,24 +134,26 @@ public static void main(String[] args) throws IOException, InterruptedException 
         totalNumberOfItems+=count;
         countPerThread[i]=count;
     }
-    logger.debug("| Total number of Items consumed: {}", totalNumberOfItems);
+    conciseLogger.debug("   Total number of Items consumed: {}", totalNumberOfItems);
     for(int i=0; i<=countPerThread.length-1; i++){
-        logger.debug("| Thread {}: {}", (i+1), countPerThread[i]);
+        conciseLogger.debug("   Thread {}: {}", (i+1), countPerThread[i]);
     }
-    logger.debug("| Number of times Buffer was full: {} ", producer.getBufferFullCount());
-    logger.debug("| Number of times Buffer was empty: {}",  totalBufferEmpty);
-    logger.debug("---------------------------------------------");
+    conciseLogger.debug("   Number of times Buffer was full: {} ", producer.getBufferFullCount());
+    conciseLogger.debug("   Number of times Buffer was empty: {}",  totalBufferEmpty);
      /*
     Multiply two matrices normally
      */
-    logger.debug("---------------------------------------------");
+    conciseLogger.debug("---------------------------------------------");
     WorkItem workItem= normalMatrixMultiplication.matrixMultiplication(matrixA, matrixB);
     long normalTotalTime=workItem.getTime();
     String matrixCNormal= Arrays.stream(workItem.getMatrix())
             .map(Arrays::toString)
             .collect(Collectors.joining("\n"));
-    logger.debug("Final matrix produced using for loops: {}{}", "\n", matrixCNormal);
-    logger.debug("Time taken: {}ms", normalTotalTime);
-    logger.debug("---------------------------------------------");
+    logger.debug("  Final matrix produced using for loops: {}{}", "\n", matrixCNormal);
+    conciseLogger.debug("   Time taken to multiply using 'for' loops: {}ms", normalTotalTime);
+    conciseLogger.debug("}");
+    conciseLogger.debug("---------------------END OF REPORT------------------------");
+
+
 }
 }
